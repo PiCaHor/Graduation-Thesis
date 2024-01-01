@@ -48,7 +48,7 @@ example:
         total[None] = total[None] + x[i]  
         
 out-mp4: ti video -f40
-convert to gif 
+convert to gif : ti gif -i video.mp4 -f40
 """
 
 

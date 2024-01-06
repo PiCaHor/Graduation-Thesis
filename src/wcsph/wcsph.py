@@ -20,6 +20,8 @@ class WCSPHSolver(SPHBase):
             self.ps.density[p_i] = 0.0
             for j in range(self.ps.particle_neighbors_num[p_i]):
                 p_j = self.ps.particle_neighbors[p_i, j]
+                if self.ps.material[p_j] != self.ps.material_fluid:
+                    continue
                 x_j = self.ps.x[p_j]
                 self.ps.density[p_i] += self.ps.m_V * self.cubic_kernel((x_i - x_j).norm())
             self.ps.density[p_i] *= self.density_0
@@ -36,6 +38,8 @@ class WCSPHSolver(SPHBase):
             d_v = ti.Vector([0.0 for _ in range(self.ps.dim)])
             for j in range(self.ps.particle_neighbors_num[p_i]):
                 p_j = self.ps.particle_neighbors[p_i, j]
+                if self.ps.material[p_j] != self.ps.material_fluid:
+                    continue
                 x_j = self.ps.x[p_j]
                 # Compute Pressure force contribution
                 d_v += self.pressure_force(p_i, p_j, x_i-x_j)
@@ -52,6 +56,8 @@ class WCSPHSolver(SPHBase):
             d_v[self.ps.dim-1] = self.g
             for j in range(self.ps.particle_neighbors_num[p_i]):
                 p_j = self.ps.particle_neighbors[p_i, j]
+                if self.ps.material[p_j] != self.ps.material_fluid:
+                    continue
                 x_j = self.ps.x[p_j]
                 d_v += self.viscosity_force(p_i, p_j, x_i - x_j)
             self.d_velocity[p_i] = d_v

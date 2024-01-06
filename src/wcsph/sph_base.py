@@ -12,6 +12,7 @@ class SPHBase:
         self.mass = self.ps.m_V * self.density_0
         self.dt = ti.field(float, shape=())
         self.dt[None] = 2e-4
+        self.c_s_pow = 115.6
 
     @ti.func
     def cubic_kernel(self, r_norm):
@@ -61,12 +62,30 @@ class SPHBase:
         return res
 
     @ti.func
+    def gamma_function(self, r):
+        q = r.norm() / self.ps.support_radius
+        res = 0.02 * self.c_s_pow / r.norm()
+        if q < 2.0/3:
+            res *= 2.0/3
+        elif q < 1:
+            res *= 2*q - 3.0 / 2 * q * q
+        elif q < 2:
+            res *= 0.5 * (2 - q) * (2 - q)
+        else:
+            res = 0
+        return res
+
+    @ti.func
     def viscosity_force(self, p_i, p_j, r):
         # Compute the viscosity force contribution
         v_xy = (self.ps.v[p_i] - self.ps.v[p_j]).dot(r)
         res = 2 * (self.ps.dim + 2) * self.viscosity * (self.mass / (self.ps.density[p_j])) * v_xy / (
-            r.norm()**2 + 0.01 * self.ps.support_radius**2) * self.cubic_kernel_derivative(
-                r)
+            r.norm()**2 + 0.01 * self.ps.support_radius**2) * self.cubic_kernel_derivative(r)
+        return res
+
+    @ti.func
+    def boundary_force(self, r):
+        res = 0.5 * self.gamma_function(r) * r / r.norm()
         return res
 
     @ti.func
@@ -82,18 +101,29 @@ class SPHBase:
 
     @ti.func
     def simulate_collisions(self, p_i, vec, d):
-        # Collision factor, assume roughly (1-c_f)*velocity loss after collision
-        c_f = 0.3
-        self.ps.x[p_i] += vec * d
-        self.ps.v[p_i] -= (1.0 + c_f) * self.ps.v[p_i].dot(vec) * vec
 
+        c_f = 0.7
+        self.ps.x[p_i] += vec * d
+        # self.ps.v[p_i] -= (1.0 + c_f) * self.ps.v[p_i].dot(vec) * vec
+        for j in range(self.ps.particle_neighbors_num[p_i]):
+            p_j = self.ps.particle_neighbors[p_i, j]
+            if self.ps.material[p_j] != self.ps.material_fluid:
+                x_i = self.ps.x[p_i]
+                x_j = self.ps.x[p_j]
+                # self.ps.v[p_i] += self.boundary_force(x_i-x_j)  # raw
+
+                # Nadir Akinci, Markus Ihmsen, Gizem Akinci, Barbara Solenthaler, and Matthias Teschner
+                # "Versatile rigid-fluid coupling for incompressible SPH", ACM Transactions on Graphics 31(4), 2012
+                self.ps.v[p_i] = -self.density_0 * self.ps.m_V * (self.ps.pressure[p_i] / self.ps.density[p_i] ** 2
+                                + self.ps.pressure[p_j] / self.ps.density[p_j] ** 2) \
+                                * self.cubic_kernel_derivative(x_i - x_j)
     @ti.kernel
     def enforce_boundary(self):
         for p_i in range(self.ps.particle_num[None]):
             if self.ps.dim == 2:
                 if self.ps.material[p_i] == self.ps.material_fluid:
                     pos = self.ps.x[p_i]
-                    if pos[0] < self.ps.padding:
+                    if pos[0] < self.ps.padding:  # left
                         self.simulate_collisions(
                             p_i, ti.Vector([1.0, 0.0]),
                             self.ps.padding - pos[0])
@@ -113,4 +143,4 @@ class SPHBase:
     def step(self):
         self.ps.initialize_particle_system()
         self.substep()
-        # self.enforce_boundary()
+        self.enforce_boundary()

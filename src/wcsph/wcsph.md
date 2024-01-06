@@ -35,7 +35,6 @@ $$
 Monaghan J J. Smoothed particle hydrodynamics[J]. Reports on progress in physics, 2005, 68(8): 1703-1759
 $$
 \nabla^2v = 2(d+2) {\sum}{m_j \over \rho_j}{(v_{ij} * x_{ij})\over ||x_{ij}||^2 + 0.01h^2} \nabla W_{ij}\\
-where \ v_{ij} = (v_i - v_j).dot(||x_{ij}||)
 $$
 原sph公式： 反对称
 $$

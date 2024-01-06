@@ -12,36 +12,44 @@ if __name__ == "__main__":
                 cube_size=[3.0, 5.0],
                 velocity=[-5.0, -10.0],
                 density=1000.0,
-                color=0x0000FF,
+                color=0x956333,
                 material=1)
 
-    # ps.add_cube(lower_corner=[3, 1],
-    #             cube_size=[2.0, 6.0],
-    #             velocity=[0.0, -20.0],
-    #             density=1000.0,
-    #             color=0x956333,
-    #             material=1)
+    ps.add_cube(lower_corner=[3, 1],
+                cube_size=[2.0, 6.0],
+                velocity=[0.0, -20.0],
+                density=1000.0,
+                color=0x956333,
+                material=1)
 
-    h = ps.support_radius
     # add boundary particle
-    ps.add_cube(lower_corner=[0, 0],
-                cube_size=[h, ps.bound[1]],
+    h = ps.support_radius
+    ps.add_cube(lower_corner=[-2 * h, 0],
+                cube_size=[2 * h, ps.bound[1]],
                 velocity=[0.0, 0.0],
                 density=1000.0,
                 material=0,
                 color=0x000000
                 )
 
-    ps.add_cube(lower_corner=[h, 0],
-                cube_size=[ps.bound[1]-h, h],
+    ps.add_cube(lower_corner=[-h, -2 * h],
+                cube_size=[ps.bound[0]+h+h, 2 * h],
                 velocity=[0.0, 0.0],
                 density=1000.0,
                 material=0,
                 color=0x000000
                 )
 
-    ps.add_cube(lower_corner=[ps.bound[1]-h, h],
-                cube_size=[h, ps.bound[1]-h],
+    ps.add_cube(lower_corner=[ps.bound[0], 0],
+                cube_size=[2 * h, ps.bound[1]],
+                velocity=[0.0, 0.0],
+                density=1000.0,
+                material=0,
+                color=0x000000
+                )
+
+    ps.add_cube(lower_corner=[-h, ps.bound[1]],
+                cube_size=[ps.bound[0]+h+h, 2 * h],
                 velocity=[0.0, 0.0],
                 density=1000.0,
                 material=0,
@@ -59,7 +67,6 @@ if __name__ == "__main__":
         gui.circles(particle_info['position'] * ps.screen_to_world_ratio / 512,
                     radius=ps.particle_radius / 1.5 * ps.screen_to_world_ratio,
                     color=particle_info['color'])
-
 
         # filename = f'./out_image/frame_{iterations:05d}.png'
         # gui.show(filename)

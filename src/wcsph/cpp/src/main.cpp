@@ -8,8 +8,10 @@ int main() {
 
     Fluid3d::ParticalSystem3D ps;
     ps.SetContainerSize(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.6, 0.6, 0.6));
-    ps.AddFluidBlock(glm::vec3(0.05, 0.35, 0.25), glm::vec3(0.15, 0.15, 0.3), glm::vec3(0.0, 0.0, -3.0), 0.01 * 0.8);
-    ps.AddFluidBlock(glm::vec3(0.35, 0.05, 0.25), glm::vec3(0.15, 0.15, 0.3), glm::vec3(0.0, 0.0, -3.0), 0.01 * 0.8);
+    ps.AddFluidBlock(glm::vec3(0.05, 0.0, 0.0), glm::vec3(0.55, 0.6, 0.13), glm::vec3(0.0, 0.0, 0.0), 0.01 * 0.8);
+    //ps.AddRigidBlock(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.05, 0.6, 0.3), glm::vec3(1.0, 0.0, 0.0), 0.01 * 0.8);
+    //ps.AddFluidBlock(glm::vec3(0.05, 0.35, 0.25), glm::vec3(0.15, 0.15, 0.3), glm::vec3(0.0, 0.0, -3.0), 0.01 * 0.8);
+    //ps.AddFluidBlock(glm::vec3(0.35, 0.05, 0.25), glm::vec3(0.15, 0.15, 0.3), glm::vec3(0.0, 0.0, -3.0), 0.01 * 0.8);
     //ps.AddFluidBlock(glm::vec3(0.2, 0.2, 0.25), glm::vec3(0.2, 0.2, 0.3), glm::vec3(0.0, 0.0, 0.0), 0.01 * 0.8);
     ps.UpdateData();
     std::cout << "partical num = " << ps.mParticalInfos.size() << std::endl;
@@ -29,6 +31,10 @@ int main() {
         renderer.Update();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         renderer.PollEvents();
+        if (renderer.GetShouldAdd()) {
+            ps.AddFluidBlock(glm::vec3(0.05, 0.35, 0.25), glm::vec3(0.1, 0.1, 0.3), glm::vec3(0.0, 0.0, -3.0), 0.01 * 0.8);
+            renderer.UpdateShouldAdd();
+        }
     }
     
     return 0;

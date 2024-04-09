@@ -36,6 +36,8 @@ namespace Fluid3d {
         
         // window
         bool ShouldClose();
+        bool GetShouldAdd();
+        void UpdateShouldAdd();
         void ProcessInput();
         void PollEvents();
 
@@ -61,9 +63,6 @@ namespace Fluid3d {
         int32_t Destroy();
 
     private:
-        bool WriteBitmapFile(const char* filename, int wid, int hei, unsigned char* bitmapData);
-
-    private:
 
         // window
         GLFWwindow* mWindow = nullptr;
@@ -79,6 +78,7 @@ namespace Fluid3d {
         bool mRightPressFlag = false;
         bool mMiddlePressFlag = false;
         bool mPauseFlag = false;
+        bool mAddParticals = false;
 
         // shaders
         Glb::Shader* mScreenQuad = nullptr;

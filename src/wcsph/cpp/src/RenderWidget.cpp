@@ -134,6 +134,16 @@ namespace Fluid3d {
         return glfwWindowShouldClose(mWindow);
     }
 
+    bool RenderWidget::GetShouldAdd()
+    {
+        return mAddParticals;
+    }
+
+    void RenderWidget::UpdateShouldAdd()
+    {
+        mAddParticals = false;
+    }
+
     void RenderWidget::ProcessInput() {
         if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(mWindow, true);
@@ -224,6 +234,9 @@ namespace Fluid3d {
         }
         else if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
             thisPtr->mPauseFlag = false;
+        }
+        else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+            thisPtr->mAddParticals = true;
         }
             
     }
@@ -334,6 +347,7 @@ namespace Fluid3d {
         mDrawFluidColor->SetVec3("f0", Para3d::F0);
         mDrawFluidColor->SetVec4("cameraIntrinsic", Glb::ProjToIntrinsic(mCamera.GetProjection(), mWindowWidth, mWindowHeight));
         mDrawFluidColor->SetVec3("fluidColor", Para3d::FLUID_COLOR);
+        mDrawFluidColor->SetVec3("rigidColor", Para3d::RIGID_COLOR);
         mDrawFluidColor->SetVec3("shadowColor", Para3d::SHADOW_COLOR);
         mDrawFluidColor->SetFloat("thicknessFactor", Para3d::THICKNESS_FACTOR);
         mDrawFluidColor->UnUse();
@@ -505,6 +519,7 @@ namespace Fluid3d {
 
     void RenderWidget::DrawParticals() {
         glFinish();
+        
         // 以点的形式画粒子
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -521,6 +536,8 @@ namespace Fluid3d {
         glDrawArrays(GL_POINTS, 0, mParticalNum);
         mSkyBox->Draw(mWindow, mVaoNull, mCamera.GetView(), mCamera.GetProjection());
         mDrawColor3d->UnUse();
+        
+        
         /*
         // 预处理
         glBindFramebuffer(GL_FRAMEBUFFER, mFboDepth);
@@ -580,7 +597,7 @@ namespace Fluid3d {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mShadowMap->DrawCaustic(&mCamera, mVaoNull, floorModel);
-
+        
         // 画地板
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);

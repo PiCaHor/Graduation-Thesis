@@ -40,6 +40,7 @@ struct ParticalInfo3d {
     highp float pressure;
     highp float pressDivDens2;
     highp uint blockId;
+    highp uint type;
 };
 
 struct NeighborInfo {
@@ -123,6 +124,11 @@ void ComputeAccleration(inout ParticalInfo3d pi) {
 void BoundaryCondition(inout ParticalInfo3d pi) {
     bool invFlag = false; 
 
+    if (pi.type == 1 && pi.position.x > containerUpperBound.x - gSupportRadius) {
+        pi.velosity = vec3(0.0,0.0,0.0); 
+        return;
+    }
+
     if (pi.position.x < containerLowerBound.x + gSupportRadius) {
         pi.velosity.x = abs(pi.velosity.x);
         invFlag = true;
@@ -175,11 +181,18 @@ void main() {
         ComputeDensityAndPress(particals[particalId]);
     }
     else if (pass == 1) {
-        particals[particalId].accleration = gGravity * gGravityDir + gExternelAccleration;
-        ComputeAccleration(particals[particalId]);
-        EulerIntegration(particals[particalId]);
-        BoundaryCondition(particals[particalId]);
-        CalculateBlockId(particals[particalId]);
+        if(particals[particalId].type == 1){
+            EulerIntegration(particals[particalId]);
+            BoundaryCondition(particals[particalId]);
+            CalculateBlockId(particals[particalId]);
+        }
+        else{
+            particals[particalId].accleration = gGravity * gGravityDir + gExternelAccleration;
+            ComputeAccleration(particals[particalId]);
+            EulerIntegration(particals[particalId]);
+            BoundaryCondition(particals[particalId]);
+            CalculateBlockId(particals[particalId]);
+        }
     }
 
     imageStore(imgOutput, ivec2(particalId % 100, particalId / 100), vec4(1.0, 1.0, 0.0, 1.0));

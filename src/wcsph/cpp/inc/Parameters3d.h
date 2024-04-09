@@ -21,6 +21,7 @@ namespace Para3d {
     const float IOR_BIAS = 0.02;
     const glm::vec3 F0 = { 0.15, 0.15, 0.15 };
     const glm::vec3 FLUID_COLOR = { 0.1, 0.5, 1.0 };
+    const glm::vec3 RIGID_COLOR = { 1.0, 1.0, 1.0 };
     const glm::vec3 SHADOW_COLOR = 0.5f * FLUID_COLOR;
     const float CAUSTIC_FACTOR = 0.004;
     const float THICKNESS_FACTOR = 0.5;
@@ -28,6 +29,11 @@ namespace Para3d {
     // 几何参数
     const float zFar = 100.0;
     const float zNear = 0.1;
+
+    //类型参数
+    const int _Fluid = 0; 
+    const int _Rigid = 1;
+
 }
 
 #endif // !PARAMETERS_3D_H

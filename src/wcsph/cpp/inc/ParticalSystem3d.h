@@ -16,7 +16,24 @@ namespace Fluid3d {
         alignas(4) float_t pressure;
         alignas(4) float_t pressDivDens2;;
         alignas(4) uint32_t blockId;
+        alignas(4) uint32_t type;
     };
+
+    //struct ParticalInfo3d
+    //{
+    //    alignas(16) glm::vec3 position;
+    //    alignas(16) glm::vec3 velocity;
+    //    alignas(16) glm::vec3 accleration;
+    //    alignas(16) glm::vec3 dii;
+    //    alignas(16) glm::vec3 dij_pj;
+    //    alignas(4) float_t aii;
+    //    alignas(4) float_t density;
+    //    alignas(4) float_t pressure;
+    //    alignas(4) float_t densityAdv;
+    //    alignas(4) float_t lastpressure;
+    //    alignas(4) float_t pressDivDens2;;
+    //    alignas(4) uint32_t blockId;
+    //};
 
     struct NeighborInfo {
         alignas(16) glm::vec3 radius;
@@ -31,6 +48,7 @@ namespace Fluid3d {
 
         void SetContainerSize(glm::vec3 corner, glm::vec3 size);
         int32_t AddFluidBlock(glm::vec3 corner, glm::vec3 size, glm::vec3 v0, float particalSpace);
+        int32_t AddRigidBlock(glm::vec3 corner, glm::vec3 size, glm::vec3 v0, float particalSpace);
         uint32_t GetBlockIdByPosition(glm::vec3 position);
         void UpdateData();
     public:
@@ -44,6 +62,7 @@ namespace Fluid3d {
         float mViscosity = Para3d::viscosity;            // 粘度系数
         float mExponent = Para3d::exponent;              // 压力指数
         int mStiffness = Para3d::stiffness;            // 刚度
+        int mType = Para3d::_Fluid;                 //类型
         std::vector<ParticalInfo3d> mParticalInfos;
         int mMaxNeighbors = 512;
 

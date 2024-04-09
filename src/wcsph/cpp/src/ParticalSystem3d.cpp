@@ -66,6 +66,46 @@ namespace Fluid3d {
                     particals[p].position = corner + glm::vec3(x, y, z);
                     particals[p].blockId = GetBlockIdByPosition(particals[p].position);
                     particals[p].velocity = v0;
+                    particals[p].pressure = 0;
+                    p++;
+                }
+            }
+        }
+
+        mParticalInfos.insert(mParticalInfos.end(), particals.begin(), particals.end());
+        return particals.size();
+    }
+
+    int32_t ParticalSystem3D::AddRigidBlock(glm::vec3 corner, glm::vec3 size, glm::vec3 v0, float particalSpace) {
+        glm::vec3 blockLowerBound = corner;
+        glm::vec3 blockUpperBound = corner + size;
+
+        if (blockLowerBound.x < mLowerBound.x ||
+            blockLowerBound.y < mLowerBound.y ||
+            blockLowerBound.z < mLowerBound.z ||
+            blockUpperBound.x > mUpperBound.x ||
+            blockUpperBound.y > mUpperBound.y ||
+            blockUpperBound.z > mUpperBound.z) {
+            return 0;
+        }
+
+        glm::uvec3 particalNum = glm::uvec3(size.x / particalSpace, size.y / particalSpace, size.z / particalSpace);
+        std::vector<ParticalInfo3d> particals(particalNum.x * particalNum.y * particalNum.z);
+
+        Glb::RandomGenerator rand;
+        int p = 0;
+        for (int idX = 0; idX < particalNum.x; idX++) {
+            for (int idY = 0; idY < particalNum.y; idY++) {
+                for (int idZ = 0; idZ < particalNum.z; idZ++) {
+                    float x = (idX + rand.GetUniformRandom()) * particalSpace;
+                    float y = (idY + rand.GetUniformRandom()) * particalSpace;
+                    float z = (idZ + rand.GetUniformRandom()) * particalSpace;
+                    particals[p].position = corner + glm::vec3(x, y, z);
+                    particals[p].blockId = GetBlockIdByPosition(particals[p].position);
+                    particals[p].velocity = v0;
+                    particals[p].pressure = 0;
+                    particals[p].accleration = glm::vec3(0.0,0.0,0.0);
+                    particals[p].type = Para3d::_Rigid;
                     p++;
                 }
             }

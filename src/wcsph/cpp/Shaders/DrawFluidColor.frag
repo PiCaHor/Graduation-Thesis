@@ -12,6 +12,7 @@ uniform mat4 model;
 uniform float eta;
 uniform vec3 f0;
 uniform vec3 fluidColor;
+uniform vec3 rigidColor;
 uniform vec3 shadowColor;
 uniform float thicknessFactor;
 
